@@ -6,6 +6,7 @@
 
 .list-item-subtitle {
   @include text-standard-date;
+  padding-left: 0.5em;   /* padding: top | right | bottom | left */
 }
 
 .clickable {
@@ -41,13 +42,13 @@
 tr.dash-row>td {
   white-space: nowrap;
   border-top: none !important;
-  padding: 0 !important;
+  padding:  0 !important;
   // line-height: 3.25em;
   vertical-align: middle !important;
 }
 
 .dash-row {
-  $dash-row-height: 3.25em;
+  $dash-row-height: 2.5em;
 
   @include clearfix;
   line-height: $dash-row-height;

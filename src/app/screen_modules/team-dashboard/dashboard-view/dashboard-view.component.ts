@@ -11,6 +11,8 @@ import { DashboardService } from 'src/app/shared/dashboard.service';
 import { DashboardComponent } from 'src/app/shared/dashboard/dashboard.component';
 import { TemplatesDirective } from 'src/app/shared/templates/templates.directive';
 import { CaponeTemplateComponent } from '../capone-template/capone-template.component';
+import { StechTeamTemplateComponent } from '../stech-template/stech-team-template.component';
+import { StechProdTemplateComponent } from '../../product-dashboard/stech-template/stech-prod-template.component';
 import { widgetsAll } from './dashboard-view';
 import {IWidget} from '../../../shared/interfaces';
 import {HttpErrorResponse} from '@angular/common/http';
@@ -39,7 +41,8 @@ export class DashboardViewComponent extends DashboardComponent implements OnInit
     this.dashboardService.clearDashboard();
     this.dashboardId = this.route.snapshot.paramMap.get('id');
     this.loadDashboard(this.dashboardId);
-    this.baseTemplate = CaponeTemplateComponent;
+    // ** Should be set once we analyze dashboard
+    // this.baseTemplate = StechTeamTemplateComponent;  // Was CaponeTemplateComponent 
   }
 
   private loadDashboard(dashboardId: string) {
@@ -57,23 +60,29 @@ export class DashboardViewComponent extends DashboardComponent implements OnInit
 
   private loadWidgets() {
     this.dashboardService.dashboardConfig$.subscribe(dashboard => {
+      console.log("Planning to load Dashboard --> ", dashboard);
       this.dashboardTitle = [dashboard.title, dashboard.configurationItemBusAppName, dashboard.configurationItemBusServName]
         .filter(Boolean).join(' - ');
 
-      const activeWidgets = new Set<string>();
-      dashboard.widgets.forEach(widget => activeWidgets.add(widget.name));
-      if (dashboard.activeWidgets && dashboard.activeWidgets.length) {
-        dashboard.activeWidgets.forEach(wName => activeWidgets.add(wName));
-      }
-      const widgets: IWidget[] = [];
-      activeWidgets.forEach(widgetName => {
-        const fWidget = this.widgetsAll.find(widget =>
-          widget.title.join().toLowerCase().replace(/\s/g, '').includes(widgetName));
-        if (fWidget) {
-          widgets.push(fWidget);
+        if (dashboard.type === 'Product')  {
+          this.baseTemplate = StechProdTemplateComponent; 
+        } else if (dashboard.type === 'Team') {
+          this.baseTemplate = StechTeamTemplateComponent;  // Was CaponeTemplateComponent 
         }
-      });
-      this.widgets = widgets;
+        const activeWidgets = new Set<string>();
+        dashboard.widgets.forEach(widget => activeWidgets.add(widget.name));
+        if (dashboard.activeWidgets && dashboard.activeWidgets.length) {
+          dashboard.activeWidgets.forEach(wName => activeWidgets.add(wName));
+        }
+        const widgets: IWidget[] = [];
+        activeWidgets.forEach(widgetName => {
+          const fWidget = this.widgetsAll.find(widget =>
+            widget.title.join().toLowerCase().replace(/\s/g, '').includes(widgetName));
+          if (fWidget) {
+              widgets.push(fWidget);
+          }
+        });
+        this.widgets = widgets;
       super.loadComponent(this.childTemplateTag);
     });
   }

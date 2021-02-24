@@ -1,0 +1,8 @@
+myToolsServer : job/myBank%20Builds%20and%20Pipelines/job/myBankPipeline2_nightly/
+
+https://github.com/VivekBuzruk/DevOpsJava
+main
+
+ : myBank-Master
+
+

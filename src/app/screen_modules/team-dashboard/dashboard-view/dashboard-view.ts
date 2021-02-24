@@ -27,6 +27,10 @@ import {SecurityScanDeleteFormComponent} from '../../../widget_modules/security-
 import {OSSDeleteFormComponent} from '../../../widget_modules/opensource-scan/oss-delete-form/oss-delete-form.component';
 import {TestDeleteFormComponent} from '../../../widget_modules/test/test-delete-form/test-delete-form.component';
 
+import {ProductWidgetComponent} from '../../../widget_modules/product/product-widget/product-widget.component';
+import {ProductConfigFormComponent} from '../../../widget_modules/product/product-config-form/product-config-form.component';
+import {ProductDeleteFormComponent} from '../../../widget_modules/product/product-delete-form/product-delete-form.component';
+
 export interface IDashboardResponse {
   data: any;
 }
@@ -76,6 +80,15 @@ export const widgetsAll = [
     widgetSize: 'col-xl-6',
     configForm: [StaticAnalysisConfigFormComponent, SecurityScanConfigComponent, OSSConfigFormComponent, TestConfigFormComponent],
     deleteForm: [StaticAnalysisDeleteFormComponent, SecurityScanDeleteFormComponent, OSSDeleteFormComponent, TestDeleteFormComponent]
+  },
+  // Product Widget
+  {
+    title: ['Product'],
+    component: [ProductWidgetComponent],
+    status: 'Success',
+    widgetSize: 'col-xl-6',
+    configForm: [ProductConfigFormComponent],
+    deleteForm: [ProductDeleteFormComponent]
   },
   /*{
     title: ['Placeholder'],

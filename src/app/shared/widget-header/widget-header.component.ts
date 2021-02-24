@@ -12,6 +12,7 @@ import {AuditModalComponent} from '../modals/audit-modal/audit-modal.component';
 import {DeleteConfirmModalComponent} from '../modals/delete-confirm-modal/delete-confirm-modal.component';
 import {WidgetState} from './widget-state';
 import {AuthService} from '../../core/services/auth.service';
+// @ts-ignore
 import moment from 'moment';
 
 @Component({

@@ -7,6 +7,7 @@ import {Router, RouterModule} from '@angular/router';
 
 import { SharedModule } from '../../../shared/shared.module';
 import { CaponeTemplateComponent } from '../capone-template/capone-template.component';
+import { StechTemplateComponent } from '../stech-template/stech-template.component';
 import { DashboardViewComponent } from './dashboard-view.component';
 import { DasboardNavbarComponent } from 'src/app/core/dasboard-navbar/dasboard-navbar.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
@@ -79,7 +80,8 @@ describe('DashboardViewComponent', () => {
     }];
     component.ngOnInit();
     component.ngAfterViewInit();
-    const childDebugElement = fixture.debugElement.query(By.directive(CaponeTemplateComponent));
+    // const childDebugElement = fixture.debugElement.query(By.directive(CaponeTemplateComponent));
+    const childDebugElement = fixture.debugElement.query(By.directive(StechTemplateComponent));
     if (childDebugElement) {
       expect(childDebugElement).toBeTruthy();
     }

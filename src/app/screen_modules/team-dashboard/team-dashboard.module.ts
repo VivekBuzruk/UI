@@ -9,6 +9,7 @@ import {StaticAnalysisModule} from '../../widget_modules/static-analysis/static-
 import {OpensourceScanModule} from '../../widget_modules/opensource-scan/opensource-scan.module';
 import {TestModule} from '../../widget_modules/test/test.module';
 import {BuildModule} from '../../widget_modules/build/build.module';
+import {ProductModule} from '../../widget_modules/product/product.module';
 import {RepoModule} from '../../widget_modules/repo/repo.module';
 import {DeployModule} from '../../widget_modules/deploy/deploy.module';
 import {FeatureModule} from '../../widget_modules/feature/feature.module';
@@ -26,6 +27,7 @@ import {FeatureModule} from '../../widget_modules/feature/feature.module';
     OpensourceScanModule,
     TestModule,
     BuildModule,
+    ProductModule,
     RepoModule,
     DeployModule,
     FeatureModule,
