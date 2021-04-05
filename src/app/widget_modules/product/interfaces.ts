@@ -1,5 +1,5 @@
 export interface IProductResponse {
-  result: IProduct[];
+  result: ITeamPipe[];
   lastUpdated: number;
 }
 
@@ -22,7 +22,7 @@ export interface IStageEntry {
   type?: string;
 }
 
-export interface IProduct {
+export interface ITeamPipe {
   collectorItemId: string;
   orderMap: IOrderMap[];
   prodStage: string;

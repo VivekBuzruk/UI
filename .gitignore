@@ -48,3 +48,6 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
+collectors_info.txt
+test-data.json
+collectors_info.txt
