@@ -74,10 +74,12 @@ export class WidgetComponent {
     this.dashboardService.dashboardConfig$.pipe(
       map(result => {
           const widget = this.findWidget(result.widgets);
+          console.log(widget);
           return widget;
       })
     ).subscribe(result => {
       if (result) {
+        console.log(result);
         this.widgetConfigSubject.next(result);
       }
     });

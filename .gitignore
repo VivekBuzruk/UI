@@ -1,5 +1,7 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
-
+.tern-project
+# npm files
+package-lock.json                                                                   
 # compiled output
 /dist
 /tmp
@@ -14,6 +16,7 @@ chrome-profiler-events.json
 speed-measure-plugin.json
 
 # IDEs and editors
+/.vscode
 /.idea
 *.iml
 .project
@@ -41,7 +44,11 @@ yarn-error.log
 /target
 testem.log
 /typings
+/personal
 
 # System Files
 .DS_Store
 Thumbs.db
+collectors_info.txt
+test-data.json
+collectors_info.txt

@@ -178,3 +178,18 @@ Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protrac
 ## Further help
 
 To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+
+
+    "codemirror": "^5.58.2",
+"@angular-devkit/build-angular": "~0.800.6",
+    "@angular/cli": "~8.0.6",
+    "@angular/compiler-cli": "~8.0.3",
+
+"typescript": "~3.4.5"
+"tslint": "~5.11.0",
+"ts-node": "^7.0.0",
+
+   "@angular/flex-layout": "^7.0.0-beta.24",
+        "@ng-bootstrap/ng-bootstrap": "^4.2.2",
+    "protractor": "^5.4.4",
+        "tslib": "^1.14.1",
