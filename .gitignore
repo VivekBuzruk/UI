@@ -45,6 +45,8 @@ yarn-error.log
 testem.log
 /typings
 /personal
+*.out
+*.swp
 
 # System Files
 .DS_Store
