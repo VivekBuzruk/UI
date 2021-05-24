@@ -178,7 +178,7 @@ export let PIE_STATICANALYSIS_CHARTS: IChart[] = [
       ] as DataItem[],
       designatedTotal: 100.0,
       label: "Violations",
-      advancedChart: false,
+      advancedChart: true,
       useCustomLabelValue: true,
       customLabelValue: 0,
     } as IPieGridData,

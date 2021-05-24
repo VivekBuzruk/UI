@@ -1,17 +1,15 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { CaponeTemplateComponent } from './capone-template.component';
-import {NO_ERRORS_SCHEMA} from '@angular/core';
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { CaponeTemplateComponent } from "./capone-template.component";
+import { NO_ERRORS_SCHEMA } from "@angular/core";
 
-describe('CaponeTemplateComponent', () => {
+describe("CaponeTemplateComponent", () => {
   let component: CaponeTemplateComponent;
   let fixture: ComponentFixture<CaponeTemplateComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        CaponeTemplateComponent
-      ],
-      schemas: [ NO_ERRORS_SCHEMA ]
+      declarations: [CaponeTemplateComponent],
+      schemas: [NO_ERRORS_SCHEMA],
     });
   }));
 
@@ -21,7 +19,7 @@ describe('CaponeTemplateComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

@@ -1,4 +1,4 @@
-@import '../../../../styles/css/dashvariables.scss';
+@import "../../../../styles/css/dashvariables.scss";
 
 #dashboard {
   color: $dash-dashboard-text;
@@ -39,7 +39,7 @@
 
   // add a halo around the alert icon
   .dash-status-fail {
-    box-shadow: 0 0 0 2px rgba(255, 255, 255, .5);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
   }
 
   // the widget uses $dash-dashboard-bg to style between header arrows

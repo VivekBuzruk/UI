@@ -20,9 +20,6 @@ import { curveLinear } from "d3-shape";
 import { NgxUIModule } from "@swimlane/ngx-ui";
 import { TimeAgoPipe } from "time-ago-pipe";
 
-import { CaponeTemplateComponent } from "../screen_modules/team-dashboard/templates/capone-template/capone-template.component";
-import { StechTeamTemplateComponent } from "../screen_modules/team-dashboard/templates/stech-template/stech-team-template.component";
-import { StechProdTemplateComponent } from "../screen_modules/product-dashboard/stech-template/stech-prod-template.component";
 import { ChartDirective } from "./charts/chart.directive";
 import { ChartComponent } from "./charts/chart/chart.component";
 import { ClickListComponent } from "./charts/click-list/click-list.component";
@@ -95,7 +92,6 @@ import { NfrrModule } from "../screen_modules/nfrr/nfrr.module";
   declarations: [
     BarHorizontalComponent,
     BaseTemplateComponent,
-    CaponeTemplateComponent,
     ChartComponent,
     ChartDirective,
     ClickListComponent,
@@ -125,8 +121,6 @@ import { NfrrModule } from "../screen_modules/nfrr/nfrr.module";
     PieGridChartComponent,
     PlaceholderWidgetComponent,
     RotationChartComponent,
-    StechTeamTemplateComponent,
-    StechProdTemplateComponent,
     TemplatesDirective,
     TimeAgoPipe,
     TwoByTwoLayoutComponent,
@@ -152,7 +146,6 @@ import { NfrrModule } from "../screen_modules/nfrr/nfrr.module";
     GeneralDeleteComponent,
     DeleteConfirmModalComponent,
     BarHorizontalComponent,
-    CaponeTemplateComponent,
     ClickListComponent,
     ComboChartComponent,
     ConfirmationModalComponent,
@@ -174,8 +167,6 @@ import { NfrrModule } from "../screen_modules/nfrr/nfrr.module";
     PlainTextChartComponent,
     TwoByOneLayoutComponent,
     RotationChartComponent,
-    StechTeamTemplateComponent,
-    StechProdTemplateComponent,
     TwoByTwoLayoutComponent,
     TwoByTwoLayoutComponent,
     AuditModalComponent,
@@ -207,7 +198,6 @@ import { NfrrModule } from "../screen_modules/nfrr/nfrr.module";
   ],
   exports: [
     BarHorizontalComponent,
-    CaponeTemplateComponent,
     ChartComponent,
     ChartDirective,
     ComboChartComponent,
@@ -227,8 +217,6 @@ import { NfrrModule } from "../screen_modules/nfrr/nfrr.module";
     PieGridChartComponent,
     ReactiveFormsModule,
     RotationChartComponent,
-    StechTeamTemplateComponent,
-    StechProdTemplateComponent,
     TemplatesDirective,
     TwoByTwoLayoutComponent,
     TwoByOneLayoutComponent,

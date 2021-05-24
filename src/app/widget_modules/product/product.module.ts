@@ -1,7 +1,7 @@
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
-import { regression } from "regression";
+// import * as regression from "regression";
 
 import { SharedModule } from "src/app/shared/shared.module";
 
@@ -24,13 +24,7 @@ import { ProductDeleteFormComponent } from "./product-delete-form/product-delete
     ProductDetailComponent,
     ProductDeleteFormComponent,
   ],
-  imports: [
-    ProductRoutingModule,
-    CommonModule,
-    NgbModule,
-    SharedModule,
-    regression,
-  ],
+  imports: [ProductRoutingModule, CommonModule, NgbModule, SharedModule],
   exports: [],
 })
 export class ProductModule {}

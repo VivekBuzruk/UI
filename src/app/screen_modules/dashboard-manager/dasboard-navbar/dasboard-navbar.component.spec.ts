@@ -1,16 +1,15 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { DasboardNavbarComponent } from './dasboard-navbar.component';
+import { DasboardNavbarComponent } from "./dasboard-navbar.component";
 
-describe('DasboardNavbarComponent', () => {
+describe("DasboardNavbarComponent", () => {
   let component: DasboardNavbarComponent;
   let fixture: ComponentFixture<DasboardNavbarComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ DasboardNavbarComponent ]
-    })
-    .compileComponents();
+      declarations: [DasboardNavbarComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {
@@ -19,7 +18,7 @@ describe('DasboardNavbarComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

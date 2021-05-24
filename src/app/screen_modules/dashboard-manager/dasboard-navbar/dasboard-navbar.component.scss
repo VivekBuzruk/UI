@@ -1,12 +1,15 @@
-.divNavBar{
-  width: 100%; text-align: center; margin: 10px;
+.divNavBar {
+  width: 100%;
+  text-align: center;
+  margin: 10px;
 }
 #header {
   text-align: center;
   position: relative;
 
   .dashboard-logo {
-    background: url("../../../assets/img/Hygieia_Logo.png") no-repeat center center;
+    background: url("../../../../assets/img/Hygieia_Logo.png") no-repeat center
+      center;
     background-size: contain;
     display: inline-block;
     position: absolute;
@@ -16,7 +19,7 @@
     width: 135px;
     height: 35px;
     &.dashboard-logo-inverse {
-      background-image: url("../../../assets/img/Hygieia_Logo.png");
+      background-image: url("../../../../assets/img/Hygieia_Logo.png");
     }
   }
 }
@@ -63,7 +66,7 @@ a.viewer {
 }
 
 .navbar-inverse {
-  background-color:white;
+  background-color: white;
   border-color: rgb(167, 159, 159);
 }
 
@@ -76,7 +79,6 @@ a.viewer {
 }
 .welcome-header {
   position: relative;
-
 
   .fa-stack {
     cursor: pointer;

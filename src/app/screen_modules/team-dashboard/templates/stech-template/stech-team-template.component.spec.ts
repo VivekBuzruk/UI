@@ -1,17 +1,15 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { StechTeamTemplateComponent } from './stech-team-template.component';
-import {NO_ERRORS_SCHEMA} from '@angular/core';
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { StechTeamTemplateComponent } from "./stech-team-template.component";
+import { NO_ERRORS_SCHEMA } from "@angular/core";
 
-describe('StechTeamTemplateComponent', () => {
+describe("StechTeamTemplateComponent", () => {
   let component: StechTeamTemplateComponent;
   let fixture: ComponentFixture<StechTeamTemplateComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        StechTeamTemplateComponent
-      ],
-      schemas: [ NO_ERRORS_SCHEMA ]
+      declarations: [StechTeamTemplateComponent],
+      schemas: [NO_ERRORS_SCHEMA],
     });
   }));
 
@@ -21,7 +19,7 @@ describe('StechTeamTemplateComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

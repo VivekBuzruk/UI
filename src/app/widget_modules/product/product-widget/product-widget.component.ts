@@ -11,6 +11,7 @@ import { of, from, Subscription, Observable } from "rxjs";
 import { distinctUntilChanged, startWith, switchMap } from "rxjs/operators";
 import { filter, map, tap } from "rxjs/operators";
 import { linear, DataPoint, Result } from "regression"; // Shift to https://www.npmjs.com/package/simple-statistics
+// import * as regression from "regression"; // const reg = regression('linear', [1, 2, 3, 4, 5]);
 import {
   IClickListData,
   IClickListItem,
@@ -531,9 +532,10 @@ export class ProductWidgetComponent
         ].summary.lastUpdated.longDisplay = lastUpdated.format(
           "MMMM Do YYYY, h:mm:ss a"
         );
+
         teamStageData[
           stageName
-        ].summary.lastUpdated.shortDisplay = lastUpdated.dash("ago");
+        ].summary.lastUpdated.shortDisplay = lastUpdated.fromNow(); // dash("ago");
       }
       // stage deviation
       if (teamStageData[stageName].stageStdDeviation == undefined) {

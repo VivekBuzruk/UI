@@ -63,7 +63,7 @@ import { PieChartModule } from "@swimlane/ngx-charts";
     NgbTypeaheadModule,
     PieChartModule,
   ],
-  entryComponents: [DashboardCreateComponent],
+  entryComponents: [DashboardCreateComponent, DashboardListComponent],
   providers: [DashboardListService],
 })
 export class LandingPageModule {}
