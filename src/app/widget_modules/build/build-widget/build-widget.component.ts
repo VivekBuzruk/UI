@@ -423,9 +423,11 @@ export class BuildWidgetComponent
       this.charts[2].data[0] = [{ name: new Date(), value: 0 }];
       this.charts[2].colorScheme.domain = ["red"];
       this.charts[2].data[1][0].series = [{ name: "No Data Found", value: 0 }];
-      this.charts[3].data[0].value = 0;
-      this.charts[3].data[1].value = 0;
-      this.charts[3].data[2].value = 0;
+      if (this.charts[3].data[0] !== undefined) {
+        this.charts[3].data[0].value = 0;
+        this.charts[3].data[1].value = 0;
+        this.charts[3].data[2].value = 0;
+      }
     }
     super.loadComponent(this.childLayoutTag);
   }
