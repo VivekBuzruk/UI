@@ -18,6 +18,8 @@ import {
   ChartComponent,
   BaseChartComponent,
   calculateViewDimensions,
+  LegendPosition,
+  ScaleType,
   trimLabel,
   gridLayout,
   formatLabel,
@@ -240,7 +242,7 @@ export class PieGridComponent extends BaseChartComponent {
   setColors(): void {
     this.colorScale = new ColorHelper(
       this.scheme,
-      "ordinal",
+      ScaleType.Ordinal,
       this.domain,
       this.customColors
     );

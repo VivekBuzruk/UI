@@ -20,8 +20,8 @@ import { curveLinear } from "d3-shape";
 import { NgxUIModule } from "@swimlane/ngx-ui";
 import { TimeAgoPipe } from "time-ago-pipe";
 
-import { CaponeTemplateComponent } from "../screen_modules/team-dashboard/capone-template/capone-template.component";
-import { StechTeamTemplateComponent } from "../screen_modules/team-dashboard/stech-template/stech-team-template.component";
+import { CaponeTemplateComponent } from "../screen_modules/team-dashboard/templates/capone-template/capone-template.component";
+import { StechTeamTemplateComponent } from "../screen_modules/team-dashboard/templates/stech-template/stech-team-template.component";
 import { StechProdTemplateComponent } from "../screen_modules/product-dashboard/stech-template/stech-prod-template.component";
 import { ChartDirective } from "./charts/chart.directive";
 import { ChartComponent } from "./charts/chart/chart.component";
@@ -31,6 +31,7 @@ import { ComboSeriesVerticalComponent } from "./charts/combo-series-vertical/com
 import { GaugeChartComponent } from "./charts/gauge-chart/gauge-chart.component";
 import { LineAndBarChartComponent } from "./ngx-charts/line-and-bar-chart/line-and-bar-chart.component";
 import { LineChartComponent } from "./charts/line-chart/line-chart.component";
+import { CustomLinerChartService } from "./charts/line-chart/custom-linear-chart.service";
 import { NumberCardChartComponent } from "./charts/number-card-chart/number-card-chart.component";
 import { PlainTextChartComponent } from "./charts/plain-text-chart/plain-text-chart.component";
 import { DashStatusComponent } from "./dash-status/dash-status.component";
@@ -55,6 +56,7 @@ import { OneChartLayoutComponent } from "./layouts/one-chart-layout/one-chart-la
 import { OneByTwoLayoutComponent } from "./layouts/one-by-two-layout/one-by-two-layout.component";
 import { HorizontalBarChartComponent } from "./charts/horizontal-bar-chart/horizontal-bar-chart.component";
 import { BarHorizontalComponent } from "./ngx-charts/bar-horizontal/bar-horizontal.component";
+import { PieChartComponent } from "./charts/pie-chart/pie-chart.component";
 import { PieGridChartComponent } from "./charts/pie-grid-chart/pie-grid-chart.component";
 import { PieGridComponent } from "./ngx-charts/pie-grid/pie-grid.component";
 import { AuditModalComponent } from "./modals/audit-modal/audit-modal.component";
@@ -91,7 +93,6 @@ import { NfrrModule } from "../screen_modules/nfrr/nfrr.module";
 
 @NgModule({
   declarations: [
-    GeneralDeleteComponent,
     BarHorizontalComponent,
     BaseTemplateComponent,
     CaponeTemplateComponent,
@@ -108,6 +109,7 @@ import { NfrrModule } from "../screen_modules/nfrr/nfrr.module";
     DetailModalDirective,
     FormModalComponent,
     FormModalDirective,
+    GeneralDeleteComponent,
     HorizontalBarChartComponent,
     LayoutComponent,
     LayoutDirective,
@@ -118,6 +120,7 @@ import { NfrrModule } from "../screen_modules/nfrr/nfrr.module";
     OneByTwoLayoutComponent,
     OneByTwoLayoutTableChartComponent,
     PaginationComponent,
+    PieChartComponent,
     PieGridComponent,
     PieGridChartComponent,
     PlaceholderWidgetComponent,
@@ -125,7 +128,7 @@ import { NfrrModule } from "../screen_modules/nfrr/nfrr.module";
     StechTeamTemplateComponent,
     StechProdTemplateComponent,
     TemplatesDirective,
-
+    TimeAgoPipe,
     TwoByTwoLayoutComponent,
     WidgetComponent,
     WidgetDirective,
@@ -164,6 +167,7 @@ import { NfrrModule } from "../screen_modules/nfrr/nfrr.module";
     OneByTwoLayoutComponent,
     OneByTwoLayoutTableChartComponent,
     OneChartLayoutComponent,
+    PieChartComponent,
     PieGridComponent,
     PieGridChartComponent,
     PlaceholderWidgetComponent,
@@ -180,7 +184,6 @@ import { NfrrModule } from "../screen_modules/nfrr/nfrr.module";
     EditDashboardModalComponent,
   ],
   imports: [
-    BaseChartComponent,
     ChartCommonModule,
     CommonModule,
     DragDropModule,
@@ -199,17 +202,8 @@ import { NfrrModule } from "../screen_modules/nfrr/nfrr.module";
     NbTabsetModule,
     NbIconModule,
     TabsFixturesModule,
-    TimeAgoPipe,
+
     NgxPaginationModule,
-    // Others
-    calculateViewDimensions,
-    ColorHelper,
-    LineSeriesComponent,
-    scaleBand,
-    scaleLinear,
-    scalePoint,
-    scaleTime,
-    curveLinear,
   ],
   exports: [
     BarHorizontalComponent,
@@ -228,6 +222,7 @@ import { NfrrModule } from "../screen_modules/nfrr/nfrr.module";
     OneByTwoLayoutComponent,
     OneByTwoLayoutTableChartComponent,
     PaginationComponent,
+    PieChartComponent,
     PieGridComponent,
     PieGridChartComponent,
     ReactiveFormsModule,
@@ -251,6 +246,6 @@ import { NfrrModule } from "../screen_modules/nfrr/nfrr.module";
     CollectorItemModule,
     NfrrModule,
   ],
-  providers: [UserDataService, RouterModule],
+  providers: [CustomLinerChartService, UserDataService, RouterModule],
 })
 export class SharedModule {}

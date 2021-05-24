@@ -1,12 +1,13 @@
 @import "../../../../../node_modules/bootstrap/scss/mixins/";
-@import '../../../../styles/css/charts.scss';
-@import '../../../../styles/css/dashvariables.scss';
-@import '../../../../styles/css/dash-status.scss';
-@import '../../../../styles/css/mixins.scss';
+@import "../../../../styles/css/charts.scss";
+@import "../../../../styles/css/dashvariables.scss";
+@import "../../../../styles/css/dash-status.scss";
+@import "../../../../styles/css/mixins.scss";
 
 .list-item-subtitle {
   @include text-standard-date;
-  padding-left: 0.5em;   /* padding: top | right | bottom | left */
+  padding-left: 0.5em; /* padding: top | right | bottom | left */
+  font-size: 1em;
 }
 
 .clickable {
@@ -16,8 +17,8 @@
 .clickable-title {
   border-bottom: 1px solid;
   color: $dash-widget-heading-text;
-  letter-spacing: .1em;
-  padding-bottom: .5em;
+  letter-spacing: 0.1em;
+  padding-bottom: 0.5em;
   margin-bottom: 1em;
 
   @include border-top-radius($dash-widget-border-radius);
@@ -33,16 +34,15 @@
   }
 }
 
-
 .latest-builds {
   font-size: 10px;
   line-height: 10px;
 }
 
-tr.dash-row>td {
+tr.dash-row > td {
   white-space: nowrap;
   border-top: none !important;
-  padding:  0 !important;
+  padding: 0 !important;
   // line-height: 3.25em;
   vertical-align: middle !important;
 }
@@ -55,7 +55,7 @@ tr.dash-row>td {
   vertical-align: middle;
 
   .fa {
-    margin-right: .5em;
+    margin-right: 0.5em;
   }
 
   &.clickable:hover {
@@ -77,9 +77,10 @@ tr.dash-row>td {
 
 list-item-title {
   display: inline-block;
-  margin-right: 1em;
+  margin-right: 0.5em;
   min-width: 3em;
   @include text-lg;
+  font-size: 1.1em;
 }
 
 .build-summary-type {
