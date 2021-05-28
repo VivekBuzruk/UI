@@ -10,6 +10,7 @@ import {
 import { of, from, Subscription, Observable } from "rxjs";
 import { distinctUntilChanged, startWith, switchMap } from "rxjs/operators";
 import { filter, map, tap } from "rxjs/operators";
+import Dexie from "dexie";
 import { linear, DataPoint, Result } from "regression"; // Shift to https://www.npmjs.com/package/simple-statistics
 // import * as regression from "regression"; // const reg = regression('linear', [1, 2, 3, 4, 5]);
 import {
@@ -35,8 +36,6 @@ import {
   IOrderMap,
   IProdWidget,
   IProdConfigOptions,
-} from "../interfaces";
-import {
   StageEachCommit,
   StageCommit,
   ProdCommitTime,
@@ -59,15 +58,6 @@ import { DEFAULT_BREAKPOINTS } from "@angular/flex-layout";
 export class ProductWidgetComponent
   extends WidgetComponent
   implements OnInit, AfterViewInit, OnDestroy {
-  private readonly BUILDS_PER_DAY_TIME_RANGE = 14;
-  private readonly TOTAL_BUILD_COUNTS_TIME_RANGES = [7, 14];
-
-  private buildTimeThreshold: number;
-  private readonly useOldTotalBuildCharts = false;
-
-  // Default build time threshold
-  private readonly BUILD_TIME_THRESHOLD = 900000;
-
   // Reference to the subscription used to refresh the widget
   private intervalRefreshSubscription: Subscription;
 
@@ -87,7 +77,7 @@ export class ProductWidgetComponent
   }
 
   // Initialize the widget and set layout and charts.
-  ngOnInit() {
+  ngOnInit(): void {
     this.widgetId = "product0";
     this.layout = OneChartLayoutComponent;
 
@@ -95,34 +85,31 @@ export class ProductWidgetComponent
 
     this.auditType = "";
     this.init();
-    console.log(
-      "*** product-widget ngOnInit, productPipelineService = ",
-      this.productPipelineService
-    );
   }
 
   // After the view is ready start the refresh interval.
-  ngAfterViewInit() {
+  ngAfterViewInit(): void {
     console.log("*** product-widget ngAfterViewInit");
     this.startRefreshInterval();
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     console.log("*** product-widget ngOnDestroy");
     this.stopRefreshInterval();
   }
 
   // Start a subscription to the widget configuration for this widget and refresh the graphs each
   // cycle.
-  startRefreshInterval() {
+  startRefreshInterval(): void {
     console.log("*** product-widget startRefreshInterval");
-    var now = moment(),
-      dateEnds = now.valueOf(),
-      ninetyDaysAgo = now.add(-90, "days").valueOf(),
-      dateBegins = ninetyDaysAgo.toString();
-    var nowTimestamp = moment().valueOf();
-    var productTeams: IProductTeam[];
-    var teamDashboardDetails: any = {};
+    // tslint:disable-next-line: one-variable-per-declaration
+    const now = moment(); // get the current date and time, essentially the same as calling moment(new Date())
+    const dateEnds = now.valueOf(); // Unix Timestamp - the number of milliseconds since the Unix Epoch
+    const ninetyDaysAgo = now.add(-90, "days").valueOf();
+    const dateBegins = ninetyDaysAgo.toString();
+    const nowTimestamp = dateEnds; // moment().valueOf();  // Same as dateEnds
+    let productTeams: IProductTeam[];
+    let teamDashboardDetails: any = {};
 
     this.intervalRefreshSubscription = this.dashboardService.dashboardRefresh$
       .pipe(
@@ -136,18 +123,18 @@ export class ProductWidgetComponent
           this.widgetConfigExists = true;
           this.state = WidgetState.READY;
           productTeams = widgetConfig.options.teams;
-          return from(productTeams);
+          return from(productTeams); // Will make one Product Team available at a time
         }),
         switchMap((productTeam: IProductTeam) => {
-          return this.processTeam(
-            productTeam,
-            nowTimestamp,
+          return this.productService.commits(
             dateBegins,
-            dateEnds
+            nowTimestamp.toString(),
+            productTeam.collectorItemId
           );
         })
       )
       .subscribe((result: ITeamPipe[]) => {
+        // Not sure whether there will be more than 1, but let us handle the same
         this.hasData = result && result.length > 0;
         console.log(
           "*** Vivek: Product-widget, startRefreshInterval, received result is - ",
@@ -166,37 +153,23 @@ export class ProductWidgetComponent
       });
   }
 
-  processTeam(
-    productTeam: IProductTeam,
-    nowTimestamp: any,
-    dateBegins: any,
-    dateEnds: any
-  ): Observable<ITeamPipe[]> {
-    this.productPipelineService.addLastRequest({
-      id: productTeam.collectorItemId,
-      type: "pipeline-commit",
-      timestamp: nowTimestamp,
-    });
-    return this.productService.commits(
-      dateBegins,
-      nowTimestamp.toString(),
-      productTeam.collectorItemId
-    ); // return null;
-  }
-
   processLoad(
     teamResponse: ITeamPipe,
     nowTimestamp: any,
     dateBegins: any,
     dateEnds: any,
     ninetyDaysAgo: any
-  ) {
-    var teamStages = Object.keys(teamResponse.stages) as Array<string>;
+  ): void {
+    const teamStages = Object.keys(teamResponse.stages) as string[];
     console.log(
       "*** Vivek: Product-widget, startRefreshInterval, Stages - ",
       teamStages
     );
-
+    this.productPipelineService.addLastRequest({
+      id: teamResponse.collectorItemId,
+      type: "pipeline-commit",
+      timestamp: nowTimestamp,
+    });
     teamResponse.stages[teamResponse.prodStage].forEach(
       (commit: IStageEntry) => {
         // extend the commit object with fields we need
@@ -209,15 +182,19 @@ export class ProductWidgetComponent
           "**Vivek** product commit-data processPipelineCommitResponse, this = ",
           this
         );
-        this.productPipelineService.addProdCommitData({
-          collectorItemId: teamResponse.collectorItemId,
-          numberOfChanges: commit.numberOfChanges,
-          processedTimestamps: commit.processedTimestamps,
-          scmAuthor: commit.scmAuthor,
-          scmCommitTimeStamp: commit.scmCommitTimestamp,
-          scmRevisionNumber: commit.scmRevisionNumber,
-          timestamp: commit.processedTimestamps[teamResponse.prodStage],
-        });
+        this.productPipelineService.addProdCommitData(
+          {
+            collectorItemId: teamResponse.collectorItemId,
+            numberOfChanges: commit.numberOfChanges,
+            processedTimestamps: commit.processedTimestamps,
+            scmAuthor: commit.scmAuthor,
+            scmCommitTimeStamp: commit.scmCommitTimestamp,
+            scmRevisionNumber: commit.scmRevisionNumber,
+            timestamp: commit.processedTimestamps[teamResponse.prodStage],
+          },
+          ninetyDaysAgo,
+          dateEnds
+        );
         console.log(
           "**Vivek** product commit-data processPipelineCommitResponse, commit Done "
         );
@@ -235,138 +212,155 @@ export class ProductWidgetComponent
     console.log(
       "**Vivek** product commit-data processPipelineCommitResponse, call getProdCommitData "
     );
+
     this.productPipelineService
       .getProdCommitData(teamResponse.collectorItemId, ninetyDaysAgo, dateEnds)
-      .toArray((rows: IProdCommitData[]) => {
-        var uniqueRows = [
-          ...new Map(
-            rows.map((item) => [item["scmRevisionNumber"], item])
-          ).values(),
-        ];
-        var teamCommitData: IProdCommitData[] = new Array();
-        teamCommitData[teamResponse.prodStage] = uniqueRows.sort(
-          (a, b) => b.timestamp - a.timestamp
-        );
-        console.log("Rows ", rows);
-        console.log("Unique Rows ", uniqueRows);
-        console.log(
-          "Prod Stage Commits ",
-          teamCommitData[teamResponse.prodStage]
-        ); // result[0].stages
-        console.log(
-          "Prod Stage Orig. Data ",
-          teamResponse.stages[teamResponse.prodStage]
-        );
-
-        var stageNames = [].concat(
-          Object.keys(teamResponse.stages) as Array<string>
-        ); // ['key1', 'key2']
-        stageNames.forEach((key: string) => {
-          var value = teamResponse.stages[key];
-          console.log("Key " + key + " and StageEntry = ", value);
+      .toArray((stageCommitRows: IProdCommitData[]) => {
+        return new Dexie.Promise((resolve, reject) => {
+          resolve({ rows: stageCommitRows, teamResponse, nowTimestamp });
         });
-        // let stages : IStageEntry[] = [].concat(teamResponse.stages);
-        var stageDurations: any = {};
-        var teamStageData: StageCommit[] = new Array();
-        let nextStageName = "";
-        stageNames.reverse().forEach((currentStage: string) => {
-          var commits = []; // store our new commit object
-          var localStages = [].concat(
-            Object.keys(teamResponse.stages) as Array<string>
-          );
-          var previousStages = localStages
-            .splice(0, localStages.indexOf(currentStage))
-            .reverse(); //.values(); // only look for stages before this one
-
-          console.log("**Vivek** CurrentStage = " + currentStage);
-          commits = this.commitsForStage(
-            teamResponse,
-            currentStage,
-            nextStageName,
-            stageDurations,
-            previousStages,
-            nowTimestamp
-          );
-          // make sure commits are always set
-          teamStageData[currentStage] = {
-            commits: commits,
-          };
-          nextStageName = currentStage;
-        });
-
-        // now that we've added all the duration data for all commits in each stage
-        // we can calculate the averages and std deviation and put the data on the stage
-        for (const currentStageName in stageDurations) {
-          // stageDurations.forEach(function (durationArray, currentStageName) {
-          if (!teamStageData[currentStageName]) {
-            teamStageData[currentStageName] = {};
-          }
-
-          let stats = this.getStageDurationStats(
-            stageDurations[currentStageName]
-          ); // durationArray
-          teamStageData[currentStageName].stageAverageTime = stats.mean;
-          teamStageData[currentStageName].stageStdDeviation = stats.deviation;
-        }
-        // now that we have average and std deviation we can determine if a commit
-        // has been in the environment for longer than 2 std deviations in which case
-        // it should be marked as a failure
-        for (const stage in teamStageData) {
-          if (
-            !teamStageData[stage].stageStdDeviation ||
-            !teamStageData[stage].commits
-          ) {
-            return;
-          }
-
-          teamStageData[stage].commits.forEach(function (commit) {
-            // use the time it's been in the existing environment to compare
-            var timeInStage = commit.in[stage];
-
-            commit.errorState =
-              timeInStage > 2 * teamStageData[stage].stageStdDeviation;
-          });
-        }
-        this.createSummaryData(teamStageData);
-        // handle the api telling us which stages need configuration
-
-        let teamProdData: TeamProdData = this.getTeamProdData(
-          teamResponse,
-          teamResponse.prodStage
-        );
-        if (teamResponse.unmappedStages) {
-          for (var stageName in teamStageData) {
-            teamStageData[stageName].needsConfiguration =
-              teamResponse.unmappedStages.indexOf(stageName) != -1;
-          }
-        }
-
-        setTimeout(function () {
-          this.setTeamData(teamResponse.collectorItemId, {
-            stages: teamStageData,
-            prod: teamProdData,
-            prodStage: teamResponse.prodStage,
-          });
-        });
-        // result[0].stages.forEach((stage : {[key: string]: IStageEntry[]}) => {
-        //     console.log("Key " + stage.key + " and StageEntry = ");
-        // });
-        // if (this.hasData) {
-        //   this.loadCharts(result);
-        // } else {
-        //   this.setDefaultIfNoData();
-        // }
+      })
+      .then(this.processProdAndTeamData)
+      .catch((reason: any) => {
+        console.log("Should not reach here");
       });
+    // setTimeout(function () {
+    //   this.setTeamData(teamResponse.collectorItemId, {
+    //     stages: teamStageData,
+    //     prod: teamProdData,
+    //     prodStage: teamResponse.prodStage,
+    //   });
+    // });
+    // result[0].stages.forEach((stage : {[key: string]: IStageEntry[]}) => {
+    //     console.log("Key " + stage.key + " and StageEntry = ");
+    // });
+    // if (this.hasData) {
+    //   this.loadCharts(result);
+    // } else {
+    //   this.setDefaultIfNoData();
+    // }
+  }
+
+  processProdAndTeamData(stageCommitAndResponse: any): void {
+    const rows: IProdCommitData[] = stageCommitAndResponse.rows;
+    const teamResponse: ITeamPipe = stageCommitAndResponse.teamResponse;
+    const nowTimestamp = stageCommitAndResponse.nowTimestamp;
+    const uniqueRows: IProdCommitData[] = [
+      ...new Map(
+        rows.map((item) => [item["scmRevisionNumber"], item])
+      ).values(),
+    ];
+    let teamCommitData: IProdCommitData[] = new Array();
+    teamCommitData = uniqueRows.sort((a, b) => b.timestamp - a.timestamp); // [teamResponse.prodStage]
+    // console.log("Rows ", rows);
+    console.log("Unique Rows ", uniqueRows);
+    console.log("Prod Stage Commits ", teamCommitData); // result[0].stages // [teamResponse.prodStage]
+    console.log(
+      "Prod Stage Orig. Data ",
+      teamResponse.stages[teamResponse.prodStage]
+    );
+
+    const stageNames = [].concat(Object.keys(teamResponse.stages) as string[]); // ['key1', 'key2']
+    stageNames.forEach((key: string) => {
+      const value = teamResponse.stages[key];
+      console.log("Key " + key + " and StageEntry = ", value);
+    });
+    // let stages : IStageEntry[] = [].concat(teamResponse.stages);
+    let stageDurations: any = {};
+    let teamStageData: Record<string, StageCommit> = {};
+    let nextStageName = "";
+    stageNames.reverse().forEach((currentStage: string) => {
+      let commits = []; // store our new commit object
+      let localStages = [].concat(Object.keys(teamResponse.stages) as string[]);
+      let previousStages = localStages
+        .splice(0, localStages.indexOf(currentStage))
+        .reverse(); //.values(); // only look for stages before this one
+
+      console.log(
+        "**Vivek** processProdAndTeamData Starting Commits for Stage = " +
+          currentStage
+      );
+      try {
+        let commitsAndStageDuration = this.commitsForStage(
+          teamResponse,
+          currentStage,
+          nextStageName,
+          stageDurations,
+          previousStages,
+          nowTimestamp
+        );
+        commits = commitsAndStageDuration.stageCommits;
+        stageDurations = commitsAndStageDuration.updatedStageDurations;
+      } catch (err) {
+        console.log(
+          "**Vivek** processProdAndTeamData Error in commitsForStage = " +
+            currentStage
+        );
+        // document.getElementById("demo").innerHTML = err.message;
+      }
+      // make sure commits are always set
+      teamStageData[currentStage] = {
+        commits,
+      };
+      nextStageName = currentStage;
+    });
+
+    // now that we've added all the duration data for all commits in each stage
+    // we can calculate the averages and std deviation and put the data on the stage
+    for (const currentStageName in stageDurations) {
+      // stageDurations.forEach(function (durationArray, currentStageName) {
+      if (!teamStageData[currentStageName]) {
+        teamStageData[currentStageName] = {};
+      }
+
+      let stats = this.getStageDurationStats(stageDurations[currentStageName]); // durationArray
+      teamStageData[currentStageName].stageAverageTime = stats.mean;
+      teamStageData[currentStageName].stageStdDeviation = stats.deviation;
+    }
+    // now that we have average and std deviation we can determine if a commit
+    // has been in the environment for longer than 2 std deviations in which case
+    // it should be marked as a failure
+    for (const stage in teamStageData) {
+      if (
+        !teamStageData[stage].stageStdDeviation ||
+        !teamStageData[stage].commits
+      ) {
+        return;
+      }
+
+      teamStageData[stage].commits.forEach(function (commit) {
+        // use the time it's been in the existing environment to compare
+        var timeInStage = commit.in[stage];
+
+        commit.errorState =
+          timeInStage > 2 * teamStageData[stage].stageStdDeviation;
+      });
+    }
+    this.createSummaryData(teamStageData);
+    // handle the api telling us which stages need configuration
+
+    let teamProdData: TeamProdData = this.getTeamProdData(
+      teamResponse,
+      teamResponse.prodStage
+    );
+    if (teamResponse.unmappedStages) {
+      for (var stageName in teamStageData) {
+        teamStageData[stageName].needsConfiguration =
+          teamResponse.unmappedStages.indexOf(stageName) != -1;
+      }
+    }
   }
 
   commitsForStage(
-    teamResponse,
-    currentStage,
-    nextStageName,
+    teamResponse: ITeamPipe,
+    currentStage: string,
+    nextStageName: string,
     stageDurations,
     previousStages,
     nowTimestamp
-  ) {
+  ): any {
+    let commitInfo: any = { stageCommits: [], updatedStageDurations: {} };
+
     let commits = [];
     teamResponse.stages[currentStage].forEach((commitObj: IStageEntry) => {
       console.log(
@@ -410,12 +404,16 @@ export class ProductWidgetComponent
       let currentStageTimestamp = commitObj.processedTimestamps[currentStage];
 
       previousStages.forEach((previousStage: string) => {
-        console.log("**Vivek** CommitObj TimeStamp with " + previousStage);
+        console.log(
+          "**Vivek** check CommitObj TimeStamp with stage = " + previousStage
+        );
         if (
           !commitObj.processedTimestamps[previousStage] ||
           isNaN(currentStageTimestamp)
         ) {
-          return;
+          commitInfo.stageCommits = commits;
+          commitInfo.updatedStageDurations = stageDurations;
+          return commitInfo;
         }
 
         let previousStageTimestamp =
@@ -446,7 +444,9 @@ export class ProductWidgetComponent
       // add our commit object back
       commits.push(commit);
     });
-    return commits;
+    commitInfo.stageCommits = commits;
+    commitInfo.updatedStageDurations = stageDurations;
+    return commitInfo;
   }
 
   // Unsubscribe from the widget refresh observable, which stops widget updating.
@@ -488,7 +488,7 @@ export class ProductWidgetComponent
     return (r.deviation = Math.sqrt((r.variance = s / t))), r;
   }
 
-  createSummaryData(teamStageData: StageCommit[]) {
+  createSummaryData(teamStageData: Record<string, StageCommit>) {
     for (const stageName in teamStageData) {
       // helper for determining whether this stage has current commits
       teamStageData[stageName].summary.hasCommits =
