@@ -44,6 +44,11 @@ export class PieChartComponent extends ChartComponent implements AfterViewInit {
 
   //To be used for non-advanced pie-chart
   //  [labelFormatting]="labelFormatting"
+  // Not to be used for advanced
+  // [legend]="showLegend"
+  // [legendPosition]="legendPosition"
+  // [labels]="showLabels"
+  // [doughnut]="isDoughnut"
 
   labelFormatting(name) {
     // this name will contain the name you defined in chartData[]
