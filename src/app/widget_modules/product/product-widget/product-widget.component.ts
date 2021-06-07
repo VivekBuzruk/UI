@@ -136,10 +136,7 @@ export class ProductWidgetComponent
       .subscribe((result: ITeamPipe[]) => {
         // Not sure whether there will be more than 1, but let us handle the same
         this.hasData = result && result.length > 0;
-        console.log(
-          "**Info**: Product-widget, startRefreshInterval, received result is - ",
-          result
-        );
+
         // put all results in the database
         result.forEach((teamResponse: ITeamPipe) =>
           this.processLoad(
@@ -161,10 +158,7 @@ export class ProductWidgetComponent
     ninetyDaysAgo: any
   ): void {
     const teamStages = Object.keys(teamResponse.stages) as string[];
-    console.log(
-      "**Info**: Product-widget, startRefreshInterval, Stages - ",
-      teamStages
-    );
+
     this.productPipelineService.addLastRequest({
       id: teamResponse.collectorItemId,
       type: "pipeline-commit",
@@ -174,10 +168,7 @@ export class ProductWidgetComponent
     teamResponse.stages[teamResponse.prodStage].forEach(
       (commit: IStageEntry) => {
         // extend the commit object with fields we need
-        console.log(
-          "**Info** product commit-data processPipelineCommitResponse, commit = ",
-          commit
-        );
+
         prodCommits.push({
           collectorItemId: teamResponse.collectorItemId,
           numberOfChanges: commit.numberOfChanges,
@@ -204,18 +195,10 @@ export class ProductWidgetComponent
     ];
     let teamCommitData: IProdCommitData[] = new Array();
     teamCommitData = uniqueRows.sort((a, b) => b.timestamp - a.timestamp); // [teamResponse.prodStage]
-    // console.log("Rows ", rows);
-    console.log("Unique Rows ", uniqueRows);
-    console.log("Prod Stage Commits ", teamCommitData); // result[0].stages // [teamResponse.prodStage]
-    console.log(
-      "Prod Stage Orig. Data ",
-      teamResponse.stages[teamResponse.prodStage]
-    );
 
     const stageNames = [].concat(Object.keys(teamResponse.stages) as string[]); // ['key1', 'key2']
     stageNames.forEach((key: string) => {
       const value = teamResponse.stages[key];
-      console.log("Key " + key + " and StageEntry = ", value);
     });
     // let stages : IStageEntry[] = [].concat(teamResponse.stages);
     let stageDurations: any = {};
@@ -228,10 +211,6 @@ export class ProductWidgetComponent
         .splice(0, localStages.indexOf(currentStage))
         .reverse(); //.values(); // only look for stages before this one
 
-      console.log(
-        "**Info** processProdAndTeamData Starting Commits for Stage = " +
-          currentStage
-      );
       try {
         let commitsAndStageDuration = this.commitsForStage(
           teamResponse,
@@ -244,10 +223,7 @@ export class ProductWidgetComponent
         commits = commitsAndStageDuration.stageCommits;
         stageDurations = commitsAndStageDuration.updatedStageDurations;
       } catch (err) {
-        console.log(
-          "**Hygieia** processProdAndTeamData Error in commitsForStage = " +
-            currentStage
-        );
+        console.log("**Hygieia** Error in commitsForStage = " + currentStage);
         // document.getElementById("demo").innerHTML = err.message;
       }
       // make sure commits are always set
@@ -301,8 +277,6 @@ export class ProductWidgetComponent
       teamResponse,
       teamResponse.prodStage
     );
-    console.log("**Info** teamStageData = ", teamStageData);
-    console.log("**Info** teamProdData = ", teamProdData);
 
     if (teamResponse.unmappedStages) {
       for (var stageName in teamStageData) {
@@ -370,9 +344,6 @@ export class ProductWidgetComponent
       let currentStageTimestamp = commitObj.processedTimestamps[currentStage];
 
       previousStages.forEach((previousStage: string) => {
-        console.log(
-          "**Info** check CommitObj TimeStamp with stage = " + previousStage
-        );
         if (
           !commitObj.processedTimestamps[previousStage] ||
           isNaN(currentStageTimestamp)
@@ -415,7 +386,6 @@ export class ProductWidgetComponent
 
   // Unsubscribe from the widget refresh observable, which stops widget updating.
   stopRefreshInterval() {
-    console.log("*** product-widget stopRefreshInterval");
     if (this.intervalRefreshSubscription) {
       this.intervalRefreshSubscription.unsubscribe();
     }
@@ -423,7 +393,6 @@ export class ProductWidgetComponent
 
   loadCharts() {
     // result: ITeamPipe[]) {
-    console.log("*** product-widget loadCharts");
     super.loadComponent(this.childLayoutTag);
   }
 
@@ -615,7 +584,6 @@ export class ProductWidgetComponent
     for (const [key, value] of Object.entries(viewData.stages)) {
       // Object.entries(viewData.stages).forEach(
       //                  ([key, value]) => {
-      console.log(key, value);
       for (let j = STAGE_START_IX; j < STAGE_INFO_SIZE + STAGE_START_IX; j++) {
         if (!this.charts[ix + j]) {
           this.charts[ix + j] = {
