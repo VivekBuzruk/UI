@@ -12,7 +12,7 @@ export interface IStageEntry {
   collectorItemId?: string; // available for Prod commits
   id?: number; // available for Prod commits
   numberOfChanges: number;
-  processedTimestamps: { [key: string]: number }; // [];
+  processedTimestamps: Record<string, number>; // { [key: string]: number }; // [];
   scmAuthor: string;
   scmAuthorLogin?: string;
   scmBranch?: string;
@@ -58,7 +58,7 @@ export interface StageEachCommit {
   message: string;
   id: string;
   timestamp: number;
-  in: { [key: string]: number };
+  in: Record<string, number>; //  { [key: string]: number };
   errorState?: boolean;
 }
 
@@ -75,22 +75,22 @@ export interface StageDataSummary {
   hasCommits: boolean;
   commitsInsideTimeFrame: number;
   commitsOutsideTimeframe: number;
-  lastUpdated: displayInfo;
-  deviation: deviationInfo;
-  average: averageInfo;
+  lastUpdated: DisplayInfo;
+  deviation: DeviationInfo;
+  average: AverageInfo;
 }
 
-export interface displayInfo {
+export interface DisplayInfo {
   longDisplay: string;
   shortDisplay: string;
 }
 
-export interface deviationInfo {
+export interface DeviationInfo {
   count: number;
   descriptor: string;
 }
 
-export interface averageInfo {
+export interface AverageInfo {
   days: number;
   hours: number;
   minutes: number;
@@ -108,7 +108,7 @@ export interface TeamProdData {
 }
 
 export interface ViewData {
-  stages: StageCommit[];
+  stages: Record<string, StageCommit>;
   prod: TeamProdData;
   prodStage: string;
 }

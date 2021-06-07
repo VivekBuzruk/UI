@@ -4,7 +4,7 @@
     "node_modules/codelyzer"
   ],
   "rules": {
-    "array-type": [true, "array-simple"]
+    "array-type": [true, "array-simple"],
     "arrow-parens": false,
     "deprecation": {
       "severity": "warning"

@@ -49,7 +49,7 @@ export class DashboardViewComponent
     this.dashboardId = this.route.snapshot.paramMap.get("id");
     this.loadDashboard(this.dashboardId);
     // ** Should be set once we analyze dashboard
-    // this.baseTemplate = StechTeamTemplateComponent;  // Was CaponeTemplateComponent
+    // this.baseTemplate = CaponeTemplateComponent;  // Was
   }
 
   private loadDashboard(dashboardId: string) {
@@ -69,7 +69,6 @@ export class DashboardViewComponent
 
   private loadWidgets() {
     this.dashboardService.dashboardConfig$.subscribe((dashboard) => {
-      console.log("Planning to load Dashboard --> ", dashboard);
       this.dashboardTitle = [
         dashboard.title,
         dashboard.configurationItemBusAppName,
@@ -81,7 +80,7 @@ export class DashboardViewComponent
       if (dashboard.type === "Product") {
         this.baseTemplate = StechProdTemplateComponent;
       } else if (dashboard.type === "Team") {
-        this.baseTemplate = StechTeamTemplateComponent; // Was CaponeTemplateComponent
+        this.baseTemplate = CaponeTemplateComponent; // StechTeamTemplateComponent;
       }
       const activeWidgets = new Set<string>();
       dashboard.widgets.forEach((widget) => activeWidgets.add(widget.name));

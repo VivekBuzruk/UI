@@ -20,6 +20,7 @@ import {
 import { DashStatus } from "src/app/shared/dash-status/DashStatus";
 import { DashboardService } from "src/app/shared/dashboard.service";
 import { LayoutDirective } from "src/app/shared/layouts/layout.directive";
+import { EngineWagonLayoutChartComponent } from "src/app/shared/layouts/engine-wagon-layout-chart/engine-wagon-layout-chart.component";
 import { OneChartLayoutComponent } from "src/app/shared/layouts/one-chart-layout/one-chart-layout.component";
 import { WidgetComponent } from "src/app/shared/widget/widget.component";
 import { ProductDetailComponent } from "../product-detail/product-detail.component";
@@ -49,6 +50,8 @@ import { groupBy } from "lodash";
 
 import { WidgetState } from "../../../shared/widget-header/widget-state";
 import { DEFAULT_BREAKPOINTS } from "@angular/flex-layout";
+import { IChart } from "src/app/shared/interfaces";
+import { PlainTextChartComponent } from "../../../shared/charts/plain-text-chart/plain-text-chart.component";
 
 @Component({
   selector: "app-product-widget",
@@ -79,7 +82,7 @@ export class ProductWidgetComponent
   // Initialize the widget and set layout and charts.
   ngOnInit(): void {
     this.widgetId = "product0";
-    this.layout = OneChartLayoutComponent;
+    this.layout = EngineWagonLayoutChartComponent;
 
     this.charts = PRODUCT_CHARTS;
 
@@ -89,19 +92,16 @@ export class ProductWidgetComponent
 
   // After the view is ready start the refresh interval.
   ngAfterViewInit(): void {
-    console.log("*** product-widget ngAfterViewInit");
     this.startRefreshInterval();
   }
 
   ngOnDestroy(): void {
-    console.log("*** product-widget ngOnDestroy");
     this.stopRefreshInterval();
   }
 
   // Start a subscription to the widget configuration for this widget and refresh the graphs each
   // cycle.
   startRefreshInterval(): void {
-    console.log("*** product-widget startRefreshInterval");
     // tslint:disable-next-line: one-variable-per-declaration
     const now = moment(); // get the current date and time, essentially the same as calling moment(new Date())
     const dateEnds = now.valueOf(); // Unix Timestamp - the number of milliseconds since the Unix Epoch
@@ -137,7 +137,7 @@ export class ProductWidgetComponent
         // Not sure whether there will be more than 1, but let us handle the same
         this.hasData = result && result.length > 0;
         console.log(
-          "*** Vivek: Product-widget, startRefreshInterval, received result is - ",
+          "**Info**: Product-widget, startRefreshInterval, received result is - ",
           result
         );
         // put all results in the database
@@ -162,7 +162,7 @@ export class ProductWidgetComponent
   ): void {
     const teamStages = Object.keys(teamResponse.stages) as string[];
     console.log(
-      "*** Vivek: Product-widget, startRefreshInterval, Stages - ",
+      "**Info**: Product-widget, startRefreshInterval, Stages - ",
       teamStages
     );
     this.productPipelineService.addLastRequest({
@@ -170,83 +170,35 @@ export class ProductWidgetComponent
       type: "pipeline-commit",
       timestamp: nowTimestamp,
     });
+    let prodCommits: IProdCommitData[] = new Array<IProdCommitData>();
     teamResponse.stages[teamResponse.prodStage].forEach(
       (commit: IStageEntry) => {
         // extend the commit object with fields we need
-        // to search the db
         console.log(
-          "**Vivek** product commit-data processPipelineCommitResponse, commit = ",
+          "**Info** product commit-data processPipelineCommitResponse, commit = ",
           commit
         );
-        console.log(
-          "**Vivek** product commit-data processPipelineCommitResponse, this = ",
-          this
-        );
-        this.productPipelineService.addProdCommitData(
-          {
-            collectorItemId: teamResponse.collectorItemId,
-            numberOfChanges: commit.numberOfChanges,
-            processedTimestamps: commit.processedTimestamps,
-            scmAuthor: commit.scmAuthor,
-            scmCommitTimeStamp: commit.scmCommitTimestamp,
-            scmRevisionNumber: commit.scmRevisionNumber,
-            timestamp: commit.processedTimestamps[teamResponse.prodStage],
-          },
-          ninetyDaysAgo,
-          dateEnds
-        );
-        console.log(
-          "**Vivek** product commit-data processPipelineCommitResponse, commit Done "
-        );
-        this.productPipelineService.deleteCommitData(
-          this.productPipelineService.prodCommit,
-          ninetyDaysAgo
-        );
+        prodCommits.push({
+          collectorItemId: teamResponse.collectorItemId,
+          numberOfChanges: commit.numberOfChanges,
+          processedTimestamps: commit.processedTimestamps,
+          scmAuthor: commit.scmAuthor,
+          scmCommitTimeStamp: commit.scmCommitTimestamp,
+          scmRevisionNumber: commit.scmRevisionNumber,
+          timestamp: commit.processedTimestamps[teamResponse.prodStage],
+        });
       }
     );
-    // this.dashboardService.getDashboard(productTeams[0].dashBoardId).subscribe(response => {
-    //   console.log("*** Vivek: Team Dashboard = ", response);
-    //   teamDashboardDetails[teamResponse.collectorItemId] = response;
-    // });
-
-    console.log(
-      "**Vivek** product commit-data processPipelineCommitResponse, call getProdCommitData "
-    );
-
-    this.productPipelineService
-      .getProdCommitData(teamResponse.collectorItemId, ninetyDaysAgo, dateEnds)
-      .toArray((stageCommitRows: IProdCommitData[]) => {
-        return new Dexie.Promise((resolve, reject) => {
-          resolve({ rows: stageCommitRows, teamResponse, nowTimestamp });
-        });
-      })
-      .then(this.processProdAndTeamData)
-      .catch((reason: any) => {
-        console.log("Should not reach here");
-      });
-    // setTimeout(function () {
-    //   this.setTeamData(teamResponse.collectorItemId, {
-    //     stages: teamStageData,
-    //     prod: teamProdData,
-    //     prodStage: teamResponse.prodStage,
-    //   });
-    // });
-    // result[0].stages.forEach((stage : {[key: string]: IStageEntry[]}) => {
-    //     console.log("Key " + stage.key + " and StageEntry = ");
-    // });
-    // if (this.hasData) {
-    //   this.loadCharts(result);
-    // } else {
-    //   this.setDefaultIfNoData();
-    // }
+    this.processProdAndTeamData(prodCommits, teamResponse, nowTimestamp);
   }
 
-  processProdAndTeamData(stageCommitAndResponse: any): void {
-    const rows: IProdCommitData[] = stageCommitAndResponse.rows;
-    const teamResponse: ITeamPipe = stageCommitAndResponse.teamResponse;
-    const nowTimestamp = stageCommitAndResponse.nowTimestamp;
+  processProdAndTeamData(
+    rows: IProdCommitData[],
+    teamResponse: ITeamPipe,
+    nowTimestamp: any
+  ): void {
     const uniqueRows: IProdCommitData[] = [
-      ...new Map(
+      ...new Map( // Javascript Map object and constructor, holds key-value pair
         rows.map((item) => [item["scmRevisionNumber"], item])
       ).values(),
     ];
@@ -277,7 +229,7 @@ export class ProductWidgetComponent
         .reverse(); //.values(); // only look for stages before this one
 
       console.log(
-        "**Vivek** processProdAndTeamData Starting Commits for Stage = " +
+        "**Info** processProdAndTeamData Starting Commits for Stage = " +
           currentStage
       );
       try {
@@ -293,7 +245,7 @@ export class ProductWidgetComponent
         stageDurations = commitsAndStageDuration.updatedStageDurations;
       } catch (err) {
         console.log(
-          "**Vivek** processProdAndTeamData Error in commitsForStage = " +
+          "**Hygieia** processProdAndTeamData Error in commitsForStage = " +
             currentStage
         );
         // document.getElementById("demo").innerHTML = err.message;
@@ -308,11 +260,17 @@ export class ProductWidgetComponent
     // now that we've added all the duration data for all commits in each stage
     // we can calculate the averages and std deviation and put the data on the stage
     for (const currentStageName in stageDurations) {
-      // stageDurations.forEach(function (durationArray, currentStageName) {
       if (!teamStageData[currentStageName]) {
         teamStageData[currentStageName] = {};
+        teamStageData[currentStageName].summary = {
+          hasCommits: false,
+          commitsInsideTimeFrame: 0,
+          commitsOutsideTimeframe: 0,
+          lastUpdated: { longDisplay: "", shortDisplay: "" },
+          deviation: { count: 0, descriptor: "" },
+          average: { days: 0, hours: 0, minutes: 0 },
+        };
       }
-
       let stats = this.getStageDurationStats(stageDurations[currentStageName]); // durationArray
       teamStageData[currentStageName].stageAverageTime = stats.mean;
       teamStageData[currentStageName].stageStdDeviation = stats.deviation;
@@ -325,7 +283,7 @@ export class ProductWidgetComponent
         !teamStageData[stage].stageStdDeviation ||
         !teamStageData[stage].commits
       ) {
-        return;
+        continue;
       }
 
       teamStageData[stage].commits.forEach(function (commit) {
@@ -343,11 +301,24 @@ export class ProductWidgetComponent
       teamResponse,
       teamResponse.prodStage
     );
+    console.log("**Info** teamStageData = ", teamStageData);
+    console.log("**Info** teamProdData = ", teamProdData);
+
     if (teamResponse.unmappedStages) {
       for (var stageName in teamStageData) {
         teamStageData[stageName].needsConfiguration =
           teamResponse.unmappedStages.indexOf(stageName) != -1;
       }
+    }
+    this.setTeamData(teamResponse.collectorItemId, {
+      stages: teamStageData,
+      prod: teamProdData,
+      prodStage: teamResponse.prodStage,
+    });
+    if (this.hasData) {
+      this.loadCharts();
+    } else {
+      this.setDefaultIfNoData();
     }
   }
 
@@ -363,10 +334,6 @@ export class ProductWidgetComponent
 
     let commits = [];
     teamResponse.stages[currentStage].forEach((commitObj: IStageEntry) => {
-      console.log(
-        "**Vivek** CommitObj, scmRevisionNumber = " +
-          commitObj.scmRevisionNumber
-      );
       let commit: StageEachCommit = {
         author: commitObj.scmAuthor || "NA",
         message: commitObj.scmCommitLog || "No message",
@@ -374,7 +341,6 @@ export class ProductWidgetComponent
         timestamp: commitObj.scmCommitTimestamp,
         in: {}, //placeholder for stage duration data per commit
       };
-      //$log.debug("**DIW-D** product commit-data, processPipelineCommitData commitObj = ", commitObj);
       // make sure this stage exists to track durations
       if (stageDurations[currentStage] === undefined) {
         stageDurations[currentStage] = [];
@@ -405,15 +371,13 @@ export class ProductWidgetComponent
 
       previousStages.forEach((previousStage: string) => {
         console.log(
-          "**Vivek** check CommitObj TimeStamp with stage = " + previousStage
+          "**Info** check CommitObj TimeStamp with stage = " + previousStage
         );
         if (
           !commitObj.processedTimestamps[previousStage] ||
           isNaN(currentStageTimestamp)
         ) {
-          commitInfo.stageCommits = commits;
-          commitInfo.updatedStageDurations = stageDurations;
-          return commitInfo;
+          return;
         }
 
         let previousStageTimestamp =
@@ -457,39 +421,47 @@ export class ProductWidgetComponent
     }
   }
 
-  loadCharts(result: ITeamPipe[]) {
+  loadCharts() {
+    // result: ITeamPipe[]) {
     console.log("*** product-widget loadCharts");
+    super.loadComponent(this.childLayoutTag);
   }
 
   setDefaultIfNoData() {
     if (!this.hasData) {
-      this.charts[0].data.dataPoints[0].series = [
-        { name: new Date(), value: 0, data: "All Builds" },
-      ];
-      this.charts[0].data.dataPoints[1].series = [
-        { name: new Date(), value: 0, data: "Failed Builds" },
-      ];
-      this.charts[1].data = { items: [{ title: "No Data Found" }] };
-      this.charts[2].data[0] = [{ name: new Date(), value: 0 }];
-      this.charts[2].colorScheme.domain = ["red"];
-      this.charts[2].data[1][0].series = [{ name: "No Data Found", value: 0 }];
-      this.charts[3].data[0].value = 0;
-      this.charts[3].data[1].value = 0;
-      this.charts[3].data[2].value = 0;
+      for (let i = 0; i < this.charts.length; i++) {
+        this.charts[i].data[0] = 0;
+      }
     }
     super.loadComponent(this.childLayoutTag);
   }
 
   getStageDurationStats(a): any {
-    var r = { mean: 0, variance: 0, deviation: 0 },
-      t = a.length;
-    for (var m, s = 0, l = t; l--; s += a[l]);
+    let r = { mean: 0, variance: 0, deviation: 0 };
+    let t = a.length;
+    let m;
+    let s = 0;
+    let l = t;
+    while (l--) {
+      s += a[l];
+    }
     for (m = r.mean = s / t, l = t, s = 0; l--; s += Math.pow(a[l] - m, 2));
     return (r.deviation = Math.sqrt((r.variance = s / t))), r;
   }
 
   createSummaryData(teamStageData: Record<string, StageCommit>) {
     for (const stageName in teamStageData) {
+      if (!teamStageData[stageName].summary) {
+        teamStageData[stageName].summary = {
+          hasCommits: false,
+          commitsInsideTimeFrame: 0,
+          commitsOutsideTimeframe: 0,
+          lastUpdated: { longDisplay: "", shortDisplay: "" },
+          deviation: { count: 0, descriptor: "" },
+          average: { days: 0, hours: 0, minutes: 0 },
+        };
+      }
+
       // helper for determining whether this stage has current commits
       teamStageData[stageName].summary.hasCommits =
         teamStageData[stageName].commits &&
@@ -629,14 +601,45 @@ export class ProductWidgetComponent
         let plotPoint: DataPoint = [daysAgo, ttp.duration];
         return plotPoint;
       });
-      // let ssPlotData : Array<Array<number>> = new Array();
-      // ssPlotData = plotData
-      //                 .map ((myDataPoint : DataPoint) =>[myDataPoint[0], myDataPoint[1]]);
       let averageToProdResult: Result = linear(plotData);
       teamProdData.trendUp = averageToProdResult.equation[0] > 0; // gradient
     }
     return teamProdData;
   }
 
-  setTeamData(collectorItemId: string, viewData: ViewData) {}
+  setTeamData(collectorItemId: string, viewData: ViewData): void {
+    let ix = 0;
+    const STAGE_INFO_SIZE = 4;
+    const STAGE_START_IX = 0;
+
+    for (const [key, value] of Object.entries(viewData.stages)) {
+      // Object.entries(viewData.stages).forEach(
+      //                  ([key, value]) => {
+      console.log(key, value);
+      for (let j = STAGE_START_IX; j < STAGE_INFO_SIZE + STAGE_START_IX; j++) {
+        if (!this.charts[ix + j]) {
+          this.charts[ix + j] = {
+            title: "",
+            component: PlainTextChartComponent,
+            data: [],
+            xAxisLabel: "",
+            yAxisLabel: "",
+            colorScheme: {},
+          };
+        }
+      }
+      this.charts[ix + STAGE_START_IX].data = key;
+      this.charts[ix + STAGE_START_IX + 1].data = value.stageAverageTime
+        ? value.stageAverageTime
+        : "#";
+      this.charts[ix + STAGE_START_IX + 2].data = value.totalCommits
+        ? value.totalCommits
+        : 0;
+      this.charts[ix + STAGE_START_IX + 3].data = value.stageStdDeviation
+        ? value.stageStdDeviation
+        : "#";
+
+      ix += STAGE_INFO_SIZE;
+    }
+  }
 }

@@ -36,6 +36,7 @@ import { DashboardComponent } from "./dashboard/dashboard.component";
 import { LayoutDirective } from "./layouts/layout.directive";
 import { LayoutComponent } from "./layouts/layout/layout.component";
 import { TwoByTwoLayoutComponent } from "./layouts/two-by-two-layout/two-by-two-layout.component";
+import { EngineWagonLayoutChartComponent } from "./layouts/engine-wagon-layout-chart/engine-wagon-layout-chart.component";
 import { ConfirmationModalComponent } from "./modals/confirmation-modal/confirmation-modal.component";
 import { DetailModalComponent } from "./modals/detail-modal/detail-modal.component";
 import { DetailModalDirective } from "./modals/detail-modal/detail-modal.directive";
@@ -124,6 +125,7 @@ import { NfrrModule } from "../screen_modules/nfrr/nfrr.module";
     TemplatesDirective,
     TimeAgoPipe,
     TwoByTwoLayoutComponent,
+    EngineWagonLayoutChartComponent,
     WidgetComponent,
     WidgetDirective,
     WidgetHeaderComponent,
@@ -168,7 +170,7 @@ import { NfrrModule } from "../screen_modules/nfrr/nfrr.module";
     TwoByOneLayoutComponent,
     RotationChartComponent,
     TwoByTwoLayoutComponent,
-    TwoByTwoLayoutComponent,
+    EngineWagonLayoutChartComponent,
     AuditModalComponent,
     DashTrashComponent,
     DashEditComponent,
@@ -220,6 +222,7 @@ import { NfrrModule } from "../screen_modules/nfrr/nfrr.module";
     TemplatesDirective,
     TwoByTwoLayoutComponent,
     TwoByOneLayoutComponent,
+    EngineWagonLayoutChartComponent,
     WidgetComponent,
     WidgetDirective,
     WidgetHeaderComponent,

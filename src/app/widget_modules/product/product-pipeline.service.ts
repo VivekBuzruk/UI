@@ -43,10 +43,6 @@ export class ProductPipelineService extends Dexie {
   getLastRequest(
     collectorItemId: string
   ): Dexie.Collection<ILastRequest, string> {
-    console.log(
-      "**Vivek** product ProductPipelineService getLastRequest, collectorItemId = ",
-      collectorItemId
-    );
     return this.lastRequest
       .where("[type+id]")
       .equals(["pipeline-commit", collectorItemId]);
@@ -54,15 +50,8 @@ export class ProductPipelineService extends Dexie {
   }
 
   addLastRequest(newRequest: ILastRequest): void {
-    console.log("**Vivek** product ProductPipelineService addLastRequest");
     this.getLastRequest(newRequest.id).count((count) => {
-      if (count == 0) {
-        console.log(
-          "**Vivek** product ProductPipelineService addLastRequest, newRequest = ",
-          newRequest
-        );
-        this.lastRequest.add(newRequest);
-      }
+      this.lastRequest.add(newRequest);
     });
   }
 
@@ -71,31 +60,30 @@ export class ProductPipelineService extends Dexie {
     ninetyDaysAgo: number,
     dateEnds: number
   ): Dexie.Collection<IProdCommitData, number> {
-    console.log(
-      "**Vivek** product ProductPipelineService getProdCommitData, collectorItemId = ",
-      collectorItemId
-    );
     return this.prodCommit
       .where("[collectorItemId+timestamp]")
       .between([collectorItemId, ninetyDaysAgo], [collectorItemId, dateEnds]);
     // .toArray();
   }
 
-  addProdCommitData(newRequest: IProdCommitData): void {
-    console.log(
-      "**Vivek** product ProductPipelineService addProdCommitData, newRequest = ",
-      newRequest
-    );
-    // this.getProdCommitData(newRequest.collectorItemId).count( (count) => {
-    //     if (count == 0) {
-    //         console.log("**Vivek** product ProductPipelineService addProdCommitData, newRequest = ", newRequest);
-    //         this.prodCommit.add(newRequest);
-    //     }
-    // })
-    this.prodCommit.add(newRequest);
+  addProdCommitData(
+    newRequest: IProdCommitData,
+    ninetyDaysAgo: number,
+    dateEnds: number
+  ): void {
+    this.getProdCommitData(
+      newRequest.collectorItemId,
+      ninetyDaysAgo,
+      dateEnds
+    ).count((count) => {
+      if (count === 0) {
+        this.prodCommit.add(newRequest);
+      }
+    });
+    // this.prodCommit.add(newRequest);
   }
 
-  deleteCommitData(table: Dexie.Table, beforeTimestamp: number) {
+  deleteCommitData(table: Dexie.Table, beforeTimestamp: number): void {
     table
       .where("timestamp")
       .below(beforeTimestamp)
@@ -132,7 +120,7 @@ export interface IProdCommitData {
   collectorItemId: string;
   id?: number;
   numberOfChanges: number;
-  processedTimestamps: { [key: string]: number }; // [];
+  processedTimestamps: Record<string, number>; // { [key: string]: number }; // [];
   scmAuthor: string;
   scmCommitTimeStamp: number;
   scmRevisionNumber: string;

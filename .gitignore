@@ -30,11 +30,11 @@ speed-measure-plugin.json
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
-!.vscode/launch.json
 !.vscode/extensions.json
 .history/*
 
 # misc
+report*.json
 /.sass-cache
 /connect.lock
 /coverage
